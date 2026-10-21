@@ -1,0 +1,84 @@
+/* Escritura Rápida — global stylesheet.
+   Loaded once by the Navigator for every scene. */
+
+.root {
+    -fx-background-color: #2b2640;
+    -fx-font-family: "Segoe UI";
+}
+
+.label {
+    -fx-text-fill: #f4f1ff;
+}
+
+#welcomeLabel {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffd166;
+}
+
+#instructionLabel {
+    -fx-font-size: 14px;
+    -fx-text-fill: #b8b2d6;
+}
+
+#levelLabel {
+    -fx-font-size: 18px;
+}
+
+#timerLabel {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffd166;
+}
+
+#wordLabel {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #06d6a0;
+    -fx-wrap-text: true;
+    -fx-pref-width: 300px;
+    -fx-max-width: 300px;
+    -fx-alignment: CENTER;
+}
+
+#gameOverLabel {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ef476f;
+}
+
+#feedbackLabel {
+    -fx-font-size: 16px;
+    -fx-wrap-text: true;
+    -fx-alignment: CENTER;
+}
+
+#recordLabel,
+#remainingTimeLabel {
+    -fx-font-size: 16px;
+    -fx-text-fill: #b8b2d6;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #1e1b2e;
+    -fx-prompt-text-fill: #8a84a8;
+    -fx-background-radius: 6;
+    -fx-padding: 8;
+}
+
+.button {
+    -fx-background-color: #4cc9f0;
+    -fx-text-fill: #1e1b2e;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #72e0fa;
+}
+
+.button:pressed {
+    -fx-background-color: #2a9dbf;
+}
