@@ -4,6 +4,8 @@ import com.example.sudoku.model.GameState;
 import com.example.sudoku.service.timer.Timer;
 import com.example.sudoku.service.navigation.Navigable;
 import com.example.sudoku.service.navigation.Navigator;
+import javafx.fxml.FXML;
+
 
 /**
  * Controlador para la escena del juego. Conecta el modelo {@link GameState} con
@@ -17,3 +19,5 @@ public class GameController implements Navigable {
         this.navigator = navigator;
     }
 }
+
+
