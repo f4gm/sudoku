@@ -5,8 +5,8 @@ import com.example.sudoku.service.navigation.Navigator;
 import javafx.fxml.FXML;
 
 /**
- * Controlador de la escena de bienvenida: inicia una nueva partida cuando el jugador
- * hace clic en el botón de inicio.
+ * Welcome scene controller: starts a new game when the player
+ * clicks the start button.
  */
 public class WelcomeController implements Navigable {
     private Navigator navigator;
@@ -17,7 +17,7 @@ public class WelcomeController implements Navigable {
     }
 
     /**
-     * Gestiona el botón de inicio y navega a la escena del juego.
+     * Handles the start button and navigates to the game scene.
      */
     @FXML
     private void onStart() {

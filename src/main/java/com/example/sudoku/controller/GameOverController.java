@@ -7,8 +7,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 /**
- * Controlador para la escena de fin de partida: dibuja el resumen del encuentro
- * proporcionado por el Navegador y reinicia el juego.
+ * Controller for the game-over scene: renders the match summary
+ * provided by the Navigator and restarts the game.
  */
 public class GameOverController implements Navigable, SummaryAware {
     private Navigator navigator;
@@ -28,7 +28,7 @@ public class GameOverController implements Navigable, SummaryAware {
     private Label remainingTimeLabel;
 
     /**
-     * Reinicia desde el nivel 1
+     * Restarts from level 1
      */
     @FXML
     private void restartGame() {
@@ -36,8 +36,8 @@ public class GameOverController implements Navigable, SummaryAware {
     }
 
     /**
-     * Dibuja el resumen de la partida.
-     * Se ejecuta después de initialize(), por lo que las etiquetas ya han sido inyectadas.
+     * Draws the game summary.
+     * Executed after initialize(), so the labels have already been injected.
      */
     @Override
     public void setSummary(int completedLevels, String reason, double remainingSeconds) {

@@ -6,9 +6,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * Alterna la ventana principal entre las tres escenas del juego. Tras
- * cargar un archivo FXML, se inyecta en los controladores {@link Navigable}
- * y proporciona datos adicionales a los controladores {@link SummaryAware}.
+ * Switches the main window between the three game scenes. After
+ * loading an FXML file, it injects data into {@link Navigable}
+ * controllers and provides additional data to {@link SummaryAware}
+ * controllers.
  */
 public class Navigator {
     private final Stage stage;
@@ -18,25 +19,25 @@ public class Navigator {
     }
 
     /**
-     * Muestra la escena de bienvenida.
+     * Displays the welcome scene.
      */
     public void showWelcome() {
         show("/com/example/sudoku/view/Welcome.fxml");
     }
 
     /**
-     * Muestra la escena del juego con un nivel 1 totalmente nuevo.
+     * Displays the game scene with an all-new level 1.
      */
     public void showGame() {
         show("/com/example/sudoku/view/Game.fxml");
     }
 
     /**
-     * Muestra la pantalla de game over y presenta el resumen de la misma.
+     * Displays the game-over screen and presents a summary of the game.
      *
-     * @param completedLevels niveles que el jugador completó
-     * @param reason motivo por el que terminó la partida
-     * @param remainingSeconds segundos restantes al finalizar la partida
+     * @param completedLevels levels completed by the player
+     * @param reason the reason the game ended
+     * @param remainingSeconds seconds remaining when the game ended
      */
     public void showGameOver(int completedLevels, String reason, double remainingSeconds) {
         Object controller = show("/com/example/sudoku/view/GameOver.fxml");
@@ -47,10 +48,10 @@ public class Navigator {
     }
 
     /**
-     * Carga un archivo FXML, vincula el controlador y lo muestra en la stage.
+     * Loads an FXML file, links the controller, and displays it on the stage.
      *
-     * @param fxml ruta del recurso de la escena
-     * @return el controlador asociado al FXML, o null si la carga falla
+     * @param fxml the path to the scene resource
+     * @return the controller associated with the FXML, or null if loading fails
      */
     private Object show(String fxml) {
         try {

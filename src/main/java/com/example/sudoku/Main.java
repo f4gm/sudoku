@@ -7,8 +7,8 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 /**
- * Punto de entrada del juego en JavaFX: crea el Navigator y muestra la
- * escena de bienvenida en el escenario principal.
+ * JavaFX game entry point: creates the Navigator and displays the
+ * welcome scene on the main stage.
  */
 public class Main extends Application {
 
