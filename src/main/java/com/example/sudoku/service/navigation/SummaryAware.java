@@ -1,18 +1,18 @@
 package com.example.sudoku.service.navigation;
 
 /**
- * Permite al Navigator entregar el resumen de fin de partida al controlador
- * asociado a GameOver.fxml justo después de cargarlo, utilizando el mismo
- * patrón de inyección que {@link Navigable}.
+ * Allows the Navigator to pass the end-of-game summary to the controller
+ * associated with GameOver.fxml immediately after loading it, using the same
+ * injection pattern as {@link Navigable}.
  */
 public interface SummaryAware {
 
     /**
-     * Recibe el resumen de la partida cuando se muestra la escena de fin de juego.
+     * Receives the match summary when the game-over scene is displayed.
      *
-     * @param completedLevels niveles que el jugador completó
-     * @param reason motivo por el que terminó la partida (p. ej., "Tiempo agotado")
-     * @param remainingSeconds segundos restantes al finalizar la partida
+     * @param completedLevels levels completed by the player
+     * @param reason the reason the match ended (e.g., "Time ran out")
+     * @param remainingSeconds seconds remaining when the match ended
      */
     void setSummary(int completedLevels, String reason, double remainingSeconds);
 }

@@ -5,15 +5,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 /**
- * Clase adaptadora para eventos de teclado. Valida la
- * respuesta cuando el jugador pulsa INTRO, ignorando cualquier otra tecla.
+ * Adapter class for keyboard events. Validates the
+ * response when the player presses ENTER, ignoring any other key.
  */
 public class EnterKeyAdapter implements EventHandler<KeyEvent> {
 
     private final Runnable action;
 
     /**
-     * @param action qué ejecutar al pulsar INTRO
+     * @param action what to execute when ENTER is pressed
      */
     public EnterKeyAdapter(Runnable action) {
         this.action = action;
