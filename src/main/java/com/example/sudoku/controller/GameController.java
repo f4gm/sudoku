@@ -5,6 +5,10 @@ import com.example.sudoku.service.timer.Timer;
 import com.example.sudoku.service.navigation.Navigable;
 import com.example.sudoku.service.navigation.Navigator;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 
 
 /**
@@ -18,6 +22,25 @@ public class GameController implements Navigable {
     public void setNavigator(Navigator navigator) {
         this.navigator = navigator;
     }
+
+    @FXML
+    private GridPane sudokuGrid;
+
+    @FXML
+    private Button helpButton;
+
+    @FXML
+    private Label statusLabel;
+
+    @FXML
+    void onHelp(){
+
+    }
+
+
+
+
+
 }
 
 
