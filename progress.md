@@ -17,7 +17,7 @@
 | Fase 3 | Controlador: mouse, teclado, validación, ayuda | ⬜ No iniciada |
 | Fase 4 | Pantalla de victoria (GameOver simplificada) | ⬜ No iniciada |
 | Fase 5 | Verificación de criterios de aceptación | ⬜ No iniciada |
-| Fase 6 | Git/GitHub: ≥2 PRs y ≥2 commits por estudiante | 🔄 En curso (repo clonado y enlazado a `origin`) |
+| Fase 6 | Git/GitHub: ≥2 PRs y ≥2 commits por estudiante | 🔄 1 commit · PR pendiente de abrir |
 
 **Leyenda:** ⬜ pendiente · 🔄 en curso · ✅ completada · ⚠️ con problemas
 
@@ -32,6 +32,17 @@
 - [x] **2026-11-03** — **Instalado JDK 24** (Eclipse Temurin 24.0.2 vía winget) y configurado `JAVA_HOME` + `PATH` de usuario. `mvnw -v` → Maven 3.8.5 + Java 24.0.2.
 - [x] **2026-11-03** — **Fase 0 completada:** corregido `module-info.java` (quitado `service.timer`) y `mainClass` en `pom.xml` (`HelloApplication` → `Main`). Verificado: `mvnw -q compile` → exit 0, `mvnw validate` → exit 0, **`mvnw clean javafx:run` → exit 0 y la ventana de bienvenida se abre** ✅.
 - [x] **2026-11-03** — **`SudokuBoard` implementado** (`src/main/java/com/example/sudoku/model/SudokuBoard.java`): campos `values`/`isClue`, constructor, `getValue`, `isClue`, `setValue`, `setClue` (package-private) e `isValid` (fila, columna y bloque 2×3). Javadoc completo en versión resumida. Verificado: `mvnw -q compile` → exit 0, `mvnw -q javadoc:javadoc` → exit 0.
+- [x] **2026-11-03** — **Primer commit + push.** Rama `model/sudoku-board` → commit `65584d5` "Implementa SudokuBoard y corrige la compilacion del proyecto" (6 archivos, +437/−4). Identidad Git local: `santiago hurtado <sahurtaro@gmail.com>`.
+- [x] **2026-11-03** — `.gitignore`: agregados el PDF del enunciado y `training.md` (verificado con `git check-ignore`).
+
+### 📍 Punto exacto para retomar (próxima sesión)
+
+1. **Abrir el Pull Request** → https://github.com/f4gm/sudoku/pull/new/model/sudoku-board
+   (base `master` ← compare `model/sudoku-board`). Será el **1 de 2** PRs requeridos.
+2. **Seguir con `SudokuBoard.getConflicto(f, c, valor)`** — último método de la clase.
+3. Luego: `SudokuGenerator` (backtracking) → `GameState`.
+
+**Rama activa:** `model/sudoku-board` (no volver a `master` hasta que se mergee el PR).
 
 ### Decisiones tomadas (acordadas con el desarrollador)
 
