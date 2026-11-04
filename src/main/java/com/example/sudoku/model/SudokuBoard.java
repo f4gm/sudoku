@@ -1,5 +1,8 @@
 package com.example.sudoku.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Model of a 6x6 Sudoku board: the game rules and nothing else, with no dependency
  * on JavaFX. A value of {@code 0} means an empty cell, {@code 1..6} are playable numbers.
@@ -11,6 +14,12 @@ public class SudokuBoard {
 
     /** Board side, also the highest playable number. */
     private static final int SIZE = 6;
+
+    /** Height of a 2x3 block: two rows. */
+    public static final int SUBGRID_ROWS = 2;
+
+    /** Width of a 2x3 block: three columns. */
+    public static final int SUBGRID_COLS = 3;
 
     /** {@code 0} = empty cell, {@code 1..6} = playable number. */
     private final int[][] values;
@@ -79,7 +88,7 @@ public class SudokuBoard {
      * @param column zero-based column index
      * @param clue   {@code true} to freeze the cell, {@code false} to release it
      */
-    void setClue(int row, int column, boolean clue){
+    void setInitial(int row, int column, boolean clue){
         isClue[row][column] = clue;
     }
 
@@ -96,7 +105,7 @@ public class SudokuBoard {
      * @param value  number to test, {@code 0..SIZE}
      * @return       {@code true} when the number breaks no rule at this position
      */
-    public boolean isValid(int row, int column, int value){
+    public boolean isValidPlacement(int row, int column, int value){
         if (value == 0) {
             return true;
         }
@@ -116,10 +125,10 @@ public class SudokuBoard {
             }
         }
 
-        int startRow = (row / 2) * 2;
-        int startCol = (column / 3) * 3;
-        for (int r = startRow; r < startRow + 2; r++) {
-            for (int c = startCol; c < startCol + 3; c++) {
+        int startRow = (row / SUBGRID_ROWS) * SUBGRID_ROWS;
+        int startCol = (column / SUBGRID_COLS) * SUBGRID_COLS;
+        for (int r = startRow; r < startRow + SUBGRID_ROWS; r++) {
+            for (int c = startCol; c < startCol + SUBGRID_COLS; c++) {
                 if ((r != row || c != column) && values[r][c] == value) {
                     return false;
                 }
@@ -128,6 +137,20 @@ public class SudokuBoard {
 
         return true;
     }
+
+
+    /**
+     * Empties the board, leaving every cell editable.
+     */
+    public void clear() {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                values[r][c] = 0;
+                isClue[r][c] = false;
+            }
+        }
+    }
+
 
 
 }
