@@ -1,8 +1,5 @@
 package com.example.sudoku.model;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Model of a 6x6 Sudoku board: the game rules and nothing else, with no dependency
  * on JavaFX. A value of {@code 0} means an empty cell, {@code 1..6} are playable numbers.
