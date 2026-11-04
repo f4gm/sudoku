@@ -11,6 +11,4 @@ module com.example.sudoku {
     exports com.example.sudoku.model;
     exports com.example.sudoku.service.navigation;
     opens com.example.sudoku.service.navigation to javafx.fxml;
-    exports com.example.sudoku.service.timer;
-    opens com.example.sudoku.service.timer to javafx.fxml;
 }
