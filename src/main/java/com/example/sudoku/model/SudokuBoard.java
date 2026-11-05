@@ -1,5 +1,8 @@
 package com.example.sudoku.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Model of a 6x6 Sudoku board: the game rules and nothing else, with no dependency
  * on JavaFX. A value of {@code 0} means an empty cell, {@code 1..6} are playable numbers.
@@ -10,7 +13,7 @@ package com.example.sudoku.model;
 public class SudokuBoard {
 
     /** Board side, also the highest playable number. */
-    private static final int SIZE = 6;
+    public static final int SIZE = 6;
 
     /** Height of a 2x3 block: two rows. */
     public static final int SUBGRID_ROWS = 2;
@@ -90,6 +93,64 @@ public class SudokuBoard {
     }
 
     /**
+     * Finds the cells that would clash with a value at a given position.
+     *
+     * <p>The cell itself is excluded. Coordinates are returned as
+     * {@code int[]{row, column}} and never repeated.</p>
+     *
+     * @param row    zero-based row index
+     * @param column zero-based column index
+     * @param value  number to test, {@code 1..SIZE}; other values return an empty list
+     * @return       the conflicting cells, empty when the placement is legal
+     */
+    public List<int[]> getConflicts(int row, int column, int value) {
+        List<int[]> conflicts = new ArrayList<>();
+
+        // Out-of-range values can never conflict
+        if (value < 1 || value > SIZE) {
+            return conflicts;
+        }
+
+        boolean[][] marked = new boolean[SIZE][SIZE];
+
+        // Same row
+        for (int c = 0; c < SIZE; c++) {
+            if (c != column && values[row][c] == value) {
+                addConflict(conflicts, marked, row, c);
+            }
+        }
+
+        // Same column
+        for (int r = 0; r < SIZE; r++) {
+            if (r != row && values[r][column] == value) {
+                addConflict(conflicts, marked, r, column);
+            }
+        }
+
+        // Same 2x3 block
+        int startRow = (row / SUBGRID_ROWS) * SUBGRID_ROWS;
+        int startCol = (column / SUBGRID_COLS) * SUBGRID_COLS;
+        for (int r = startRow; r < startRow + SUBGRID_ROWS; r++) {
+            for (int c = startCol; c < startCol + SUBGRID_COLS; c++) {
+                if ((r != row || c != column) && values[r][c] == value) {
+                    addConflict(conflicts, marked, r, c);
+                }
+            }
+        }
+
+        return conflicts;
+    }
+
+    /** Adds a coordinate only the first time it is found. */
+    private void addConflict(List<int[]> conflicts, boolean[][] marked,
+                             int row, int column) {
+        if (!marked[row][column]) {
+            marked[row][column] = true;
+            conflicts.add(new int[]{row, column});
+        }
+    }
+
+    /**
      * Checks whether a number may legally occupy a cell: it must not repeat in its row,
      * column or 2x3 block. The cell itself is excluded from all three checks, so a value
      * already stored there does not conflict with itself.
@@ -102,39 +163,20 @@ public class SudokuBoard {
      * @param value  number to test, {@code 0..SIZE}
      * @return       {@code true} when the number breaks no rule at this position
      */
-    public boolean isValidPlacement(int row, int column, int value){
+    public boolean isValidPlacement(int row, int column, int value) {
+        // Clearing a cell is always allowed
         if (value == 0) {
             return true;
         }
+
+        // Invalid value
         if (value < 1 || value > SIZE) {
             return false;
         }
 
-        for (int i = 0; i < SIZE; i++) {
-            if (i != column && values[row][i] == value) {
-                return false;
-            }
-        }
-
-        for (int i = 0; i < SIZE; i++) {
-            if (i != row && values[i][column] == value) {
-                return false;
-            }
-        }
-
-        int startRow = (row / SUBGRID_ROWS) * SUBGRID_ROWS;
-        int startCol = (column / SUBGRID_COLS) * SUBGRID_COLS;
-        for (int r = startRow; r < startRow + SUBGRID_ROWS; r++) {
-            for (int c = startCol; c < startCol + SUBGRID_COLS; c++) {
-                if ((r != row || c != column) && values[r][c] == value) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        // The rules live in getConflicts: no conflicts means a legal placement
+        return getConflicts(row, column, value).isEmpty();
     }
-
 
     /**
      * Empties the board, leaving every cell editable.
@@ -148,6 +190,35 @@ public class SudokuBoard {
         }
     }
 
+    /**
+     * Tells whether every cell holds a number.
+     *
+     * @return {@code true} when no cell is empty
+     */
+    public boolean isComplete() {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (values[r][c] == 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 
-
+    /**
+     * Checks the whole board against the Sudoku rules.
+     *
+     * @return {@code true} when no filled cell breaks a row, column or block rule
+     */
+    public boolean isValid() {
+        for (int r = 0; r < SIZE; r++) {
+            for (int c = 0; c < SIZE; c++) {
+                if (values[r][c] != 0 && !isValidPlacement(r, c, values[r][c])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

@@ -5,6 +5,27 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+
+/**
+ * Generates random 6x6 Sudoku puzzles using a Backtracking algorithm.
+ *
+ * <p>The generator first creates a complete and valid Sudoku solution
+ * by recursively filling empty cells with randomly ordered candidate
+ * numbers. Once the solution has been found, exactly 2 clues are kept
+ * per 2×3 block (12 clues in total) and the rest are emptied to create
+ * the initial puzzle.</p>
+ *
+ * <p>Remaining filled cells are marked as fixed clues, preventing
+ * the player from modifying them during the game.</p>
+ *
+ * <p>The generated puzzle is guaranteed to have at least one solution,
+ * since it is derived from a previously completed valid board.
+ * However, uniqueness of the solution and puzzle difficulty are
+ * not guaranteed.</p>
+ *
+ * <p>This class belongs to the model layer and has no dependency
+ * on JavaFX.</p>
+ */
 public class SudokuGenerator {
     private final Random random;
 
@@ -12,50 +33,114 @@ public class SudokuGenerator {
         this.random = new Random();
     }
 
+    /**
+     * Generates a new Sudoku game.
+     * The generated board always has at least one solution.
+     *
+     * @param board board to initialize
+     */
     public void generateNewGame(SudokuBoard board) {
         board.clear();
 
-        // El tablero de 6x6 se divide en 3 filas y 2 columnas de bloques de 2x3
-        for (int blockRow = 0; blockRow < 3; blockRow++) {
-            for (int blockCol = 0; blockCol < 2; blockCol++) {
-                int startRow = blockRow * SudokuBoard.SUBGRID_ROWS;
-                int startCol = blockCol * SudokuBoard.SUBGRID_COLS;
+        // Generate a complete and valid Sudoku solution
+        if (!fillBoard(board)) {
+            throw new IllegalStateException(
+                    "Unable to generate a valid Sudoku board."
+            );
+        }
 
-                placeTwoRandomNumbersInBlock(board, startRow, startCol);
+        // Remove numbers to create the puzzle
+        keepTwoCluesPerBlock(board);
+
+        // Mark remaining numbers as fixed clues
+        for (int row = 0; row < SudokuBoard.SIZE; row++) {
+            for (int col = 0; col < SudokuBoard.SIZE; col++) {
+                if (board.getValue(row, col) != 0) {
+                    board.setInitial(row, col, true);
+                }
             }
         }
     }
 
-    private void placeTwoRandomNumbersInBlock(SudokuBoard board, int startRow, int startCol) {
-        // Obtenemos las 6 coordenadas [fila, columna] internas de este bloque de 2x3
-        List<int[]> blockCells = new ArrayList<>();
-        for (int r = startRow; r < startRow + SudokuBoard.SUBGRID_ROWS; r++) {
-            for (int c = startCol; c < startCol + SudokuBoard.SUBGRID_COLS; c++) {
-                blockCells.add(new int[]{r, c});
+    /**
+     * Fills the board using Backtracking.
+     *
+     * @param board Sudoku board
+     * @return true if a complete solution is found
+     */
+    private boolean fillBoard(SudokuBoard board) {
+
+        // Find the next empty cell
+        int row = -1;
+        int col = -1;
+
+        for (int r = 0; r < SudokuBoard.SIZE; r++) {
+            for (int c = 0; c < SudokuBoard.SIZE; c++) {
+                if (board.getValue(r, c) == 0) {
+                    row = r;
+                    col = c;
+                    break;
+                }
+            }
+
+            if (row != -1) {
+                break;
             }
         }
 
-        // Desordenamos aleatoriamente las posiciones y las cifras disponibles (1 a 6)
-        Collections.shuffle(blockCells, random);
-        List<Integer> possibleNumbers = new ArrayList<>(List.of(1, 2, 3, 4, 5, 6));
-        Collections.shuffle(possibleNumbers, random);
+        // No empty cells: solution found
+        if (row == -1) {
+            return true;
+        }
 
-        int placedCount = 0;
-        for (int[] cell : blockCells) {
-            if (placedCount == 2) {
-                break; // Garantiza exactamente 2 números por bloque
+        // Generate candidate numbers in random order
+        List<Integer> numbers = new ArrayList<>(
+                List.of(1, 2, 3, 4, 5, 6)
+        );
+
+        Collections.shuffle(numbers, random);
+
+        // Try each candidate
+        for (int number : numbers) {
+            if (board.isValidPlacement(row, col, number)) {
+                board.setValue(row, col, number);
+                if (fillBoard(board)) {
+                    return true;
+                }
+
+                // Backtrack
+                board.setValue(row, col, 0);
             }
+        }
 
-            int row = cell[0];
-            int col = cell[1];
+        // No candidate produced a valid solution
+        return false;
+    }
 
-            for (int num : possibleNumbers) {
-                if (board.isValidPlacement(row, col, num)) {
-                    board.setValue(row, col, num);
-                    board.setInitial(row, col, true); // Lo marca como fijo (editable = false)
-                    possibleNumbers.remove(Integer.valueOf(num));
-                    placedCount++;
-                    break;
+    /**
+     * Keeps exactly two clues per block and empties the remaining cells.
+     *
+     * @param board completed Sudoku board
+     */
+    private void keepTwoCluesPerBlock(SudokuBoard board) {
+        int blockRows = SudokuBoard.SIZE / SudokuBoard.SUBGRID_ROWS; // 3
+        int blockCols = SudokuBoard.SIZE / SudokuBoard.SUBGRID_COLS; // 2
+
+        for (int blockRow = 0; blockRow < blockRows; blockRow++) {
+            for (int blockCol = 0; blockCol < blockCols; blockCol++) {
+                int startRow = blockRow * SudokuBoard.SUBGRID_ROWS;
+                int startCol = blockCol * SudokuBoard.SUBGRID_COLS;
+
+                List<int[]> cells = new ArrayList<>();
+                for (int r = startRow; r < startRow + SudokuBoard.SUBGRID_ROWS; r++) {
+                    for (int c = startCol; c < startCol + SudokuBoard.SUBGRID_COLS; c++) {
+                        cells.add(new int[]{r, c});
+                    }
+                }
+
+                Collections.shuffle(cells, random);
+                for (int i = 2; i < cells.size(); i++) {
+                    board.setValue(cells.get(i)[0], cells.get(i)[1], 0);
                 }
             }
         }
