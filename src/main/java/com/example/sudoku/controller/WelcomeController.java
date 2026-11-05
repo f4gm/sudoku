@@ -1,8 +1,11 @@
 package com.example.sudoku.controller;
 
+import com.example.sudoku.model.AlertHelper;
 import com.example.sudoku.service.navigation.Navigable;
 import com.example.sudoku.service.navigation.Navigator;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 
 /**
  * Welcome scene controller: starts a new game when the player
@@ -16,11 +19,22 @@ public class WelcomeController implements Navigable {
         this.navigator = navigator;
     }
 
+    @FXML
+    private Button newGameButton;
+
     /**
      * Handles the start button and navigates to the game scene.
      */
     @FXML
-    private void onStart() {
+    private void onStart(ActionEvent event) {
+        boolean confirmed = AlertHelper.showConfirmation(
+                "Nuevo Juego",
+                "¿Estás seguro de iniciar una nueva partida?"
+        );
+
+        if (confirmed) {
+            startNewGame();
+        }
         navigator.showGame();
     }
 }
