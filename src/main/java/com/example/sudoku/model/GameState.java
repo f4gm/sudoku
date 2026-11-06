@@ -138,12 +138,15 @@ public class GameState {
      * Fills one empty cell with the value that leaves it with the fewest
      * candidates and uses one hint.
      *
+     * <p>A hint is never given when only one empty cell remains, so hints can
+     * never finish the board by themselves.</p>
+     *
      * @return the filled cell as {@code int[]{row, column}}, or {@code null}
-     *         when there are no hints left, the game is won or no legal
-     *         value exists for any empty cell
+     *         when there are no hints left, the game is won, fewer than two
+     *         cells are empty or no legal value exists for any empty cell
      */
     public int[] giveHint() {
-        if (hintsLeft == 0 || isWon()) {
+        if (hintsLeft == 0 || isWon() || countEmptyCells() < 2) {
             return null;
         }
 
@@ -186,5 +189,22 @@ public class GameState {
         board.setValue(bestRow, bestCol, bestValue);
         hintsLeft--;
         return new int[]{bestRow, bestCol};
+    }
+
+    /**
+     * Counts the cells that still have no value.
+     *
+     * @return number of empty cells, between {@code 0} and {@code SIZE * SIZE}
+     */
+    private int countEmptyCells() {
+        int empty = 0;
+        for (int r = 0; r < SudokuBoard.SIZE; r++) {
+            for (int c = 0; c < SudokuBoard.SIZE; c++) {
+                if (board.getValue(r, c) == 0) {
+                    empty++;
+                }
+            }
+        }
+        return empty;
     }
 }

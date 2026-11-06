@@ -55,8 +55,7 @@
 
 1. **Probar en pantalla la Fase B:** colores de bordes 2×3, celda roja, celda de ayuda (amarilla), contador "Ayuda (n)" y botón "Nuevo juego" con confirmación. Si algo no se ve bien, es ajuste de `style.css`.
    - Luego decidir: ¿la ayuda puede dejar el tablero completo? (ver ⚠️ en Fase 3).
-2. **Fase C:** ayuda con contador real (`GameState.giveHint()`), victoria vía `showGameOver()`, y usar `EnterKeyAdapter` en alguna escena.
-3. **Fase D:** arreglar `GameOver.fxml` (`#onStart` → `#restartGame`) + `fx:id` faltantes; simplificar `setSummary`; mover `AlertHelper`/`SudokuBoardAdapter` fuera de `model/` (usan JavaFX) y darles Javadoc.
+2. **Pendientes cerrados el 2026-11-06:** regla de ayuda, `EnterKeyAdapter`, mover `AlertHelper`/`SudokuBoardAdapter` a `controller/`, y pegado no numérico. Falta solo commitear y probar a mano.
 
 ### ⚠️ Incidente de integración (2026-11-04)
 
@@ -98,7 +97,9 @@
 | 13 | `model/GameState.java` | Falta Javadoc de clase, de `MAX_HINTS` y del constructor; `getHintsLeft` dice "clues" | ⚠️ Requisito de documentación | ✅ Ya estaba completo (verificado 2026-11-06) |
 | 14 | `WelcomeController` | `onStart()` llamaba a `startNewGame()`, método inexistente en esa clase | ❌ `master` no compilaba | ✅ Corregido 2026-11-06 (movido a `GameController.initialize()`) |
 | 15 | `GameController` | `startNewGame()` existía pero **nadie lo llamaba** | ❌ Tablero siempre vacío | ✅ Corregido 2026-11-06 (probado en vivo) |
-| 16 | `SudokuBoardAdapter` / `EnterKeyAdapter` | Escritos pero **nunca invocados** → el teclado no funcionaba | ❌ No se podía jugar | ✅ `SudokuBoardAdapter` conectado 2026-11-06 · ⬜ `EnterKeyAdapter` sin usar |
+| 16 | `SudokuBoardAdapter` / `EnterKeyAdapter` | Escritos pero **nunca invocados** → el teclado no funcionaba | ❌ No se podía jugar | ✅ `SudokuBoardAdapter` conectado 2026-11-06 · ✅ `EnterKeyAdapter` usado en Welcome 2026-11-06 |
+| 17 | `AlertHelper`, `SudokuBoardAdapter` | Estaban en `model/` pero usan JavaFX; `module-info` tenía un `opens` para compensarlo | ⚠️ Viola "model sin JavaFX" | ✅ Movidos a `controller/` con Javadoc; quitado el `opens` del `module-info` (2026-11-06) |
+| 18 | `SudokuBoardAdapter` | Pegar texto no numérico lanzaba `NumberFormatException`; BACKSPACE avisaba dos veces | ⚠️ | ✅ Corregido 2026-11-06 (verificado) |
 
 > ⚠️ **Nota:** los problemas 3, 6 y 7 son *latentes*: la app arranca porque solo carga `Welcome.fxml` y, al pulsar "Comenzar", muestra `Game.fxml` con el grid vacío. Explotan al intentar jugar o ganar.
 
@@ -141,16 +142,16 @@
 - [x] Teclado: 1–6 escribe, BACKSPACE/DELETE vacía, resto `consume()` ✅ (`SudokuBoardAdapter`), probado en vivo.
 - [x] Validación en tiempo real → borde rojo + mensaje ✅ probada en vivo.
 - [x] Ayuda: 1 celda por clic vía `GameState.giveHint()`, contador "Ayuda (n)" y botón deshabilitado en 0 (2026-11-06, sin probar en pantalla aún).
-- [ ] ⚠️ Ayuda no debe poder **terminar el tablero**: `giveHint` aún puede rellenar la última casilla. Pendiente en `GameState` (decidir con el equipo).
+- [x] Ayuda no puede **terminar el tablero**: `GameState.giveHint()` no rellena si queda una sola casilla vacía (2026-11-06). Verificado con programa temporal: 2 vacías → ayuda 1 dada, ayuda 2 nula, sin victoria.
 - [ ] Detección de victoria → `showGameOver` (hoy muestra un `Alert` suelto).
 - [x] Alerta de confirmación en el botón "Nuevo juego" dentro de la partida (2026-11-06) y en el Welcome.
-- [ ] Usar `EnterKeyAdapter` en alguna escena (Welcome o GameOver).
+- [x] Usar `EnterKeyAdapter` en la escena de bienvenida: ENTER inicia el juego (con la misma confirmación). 2026-11-06.
 
 ### Fase 4 — Pantalla de victoria
 - [x] Simplificar `SummaryAware` / `Navigator.showGameOver` a un solo mensaje (2026-11-06).
 - [x] Corregir `GameOver.fxml` (`onAction="#restartGame"`, `fx:id="messageLabel"`) y `GameOverController` (2026-11-06).
 - [x] Victoria conectada: `GameController` llama `navigator.showGameOver(...)` en lugar del `Alert` (2026-11-06). Compila y Javadoc OK.
-- [ ] Probar en pantalla la victoria: resolver un tablero y comprobar que aparece GameOver y que "Nuevo juego" vuelve a un tablero nuevo.
+- [x] Victoria probada (2026-11-06) con un programa de prueba temporal fuera del proyecto: carga el tablero real, lo resuelve escribiendo las celdas y comprueba que aparece GameOver con el mensaje, y que "Nuevo juego" regresa con 36 celdas. Sin excepciones. Falta probarla a mano con el mouse y el teclado.
 
 ### Fase 5 — Verificación
 - [ ] Checklist HU-1 … HU-5 completo.

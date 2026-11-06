@@ -1,9 +1,7 @@
 package com.example.sudoku.controller;
 
-import com.example.sudoku.model.AlertHelper;
 import com.example.sudoku.model.GameState;
 import com.example.sudoku.model.SudokuBoard;
-import com.example.sudoku.model.SudokuBoardAdapter;
 import com.example.sudoku.service.navigation.Navigable;
 import com.example.sudoku.service.navigation.Navigator;
 import javafx.event.ActionEvent;
@@ -216,7 +214,7 @@ public class GameController implements Navigable {
         int[] cell = game.giveHint();
 
         if (cell == null) {
-            statusLabel.setText("No hay ayudas disponibles en este momento.");
+            statusLabel.setText("No se puede dar ayuda: no quedan ayudas o solo falta una casilla por llenar.");
             updateHelpButton();
             return;
         }
