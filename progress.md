@@ -53,7 +53,8 @@
 
 ### 📍 Punto exacto para retomar (próxima sesión)
 
-1. **Fase B (vista):** `style.css` con clases reales (`.celda-error`, `.celda-ayuda`, `.celda-seleccionada`) **y migrar el controlador de `setStyle` inline a esas clases**; `Game.fxml` con botón "Nuevo juego" + contador "Ayuda (3)"; `Welcome.fxml` sin "Intrucciones TODO".
+1. **Probar en pantalla la Fase B:** colores de bordes 2×3, celda roja, celda de ayuda (amarilla), contador "Ayuda (n)" y botón "Nuevo juego" con confirmación. Si algo no se ve bien, es ajuste de `style.css`.
+   - Luego decidir: ¿la ayuda puede dejar el tablero completo? (ver ⚠️ en Fase 3).
 2. **Fase C:** ayuda con contador real (`GameState.giveHint()`), victoria vía `showGameOver()`, y usar `EnterKeyAdapter` en alguna escena.
 3. **Fase D:** arreglar `GameOver.fxml` (`#onStart` → `#restartGame`) + `fx:id` faltantes; simplificar `setSummary`; mover `AlertHelper`/`SudokuBoardAdapter` fuera de `model/` (usan JavaFX) y darles Javadoc.
 
@@ -129,9 +130,9 @@
 
 ### Fase 2 — Vista
 - [x] Crear 36 celdas en `initialize()` (`TextField` de 1 dígito, solo lectura para pistas) ✅ `buildgridUI()`.
-- [ ] `Game.fxml`: barra de botones ("Nuevo juego", "Ayuda (3)") + `GridPane` 6×6 con límites de bloque.
-- [ ] `style.css`: paleta, `.celda-error`, `.celda-ayuda`, `.celda-seleccionada` (+ migrar el controlador a esas clases).
-- [ ] `Welcome.fxml`: instrucciones reales (quitar "TODO").
+- [x] `Game.fxml`: barra de botones ("Nuevo juego", "Ayuda (3)") + `GridPane` con bordes de bloque por clase. Verificado 2026-11-06 (carga sin excepciones).
+- [x] `style.css`: paleta, `.celda-error`, `.celda-ayuda`, `.celda-seleccionada`, `.celda-pista` y bordes 2×3 por clase. El controlador ya no usa `setStyle` (2026-11-06).
+- [x] `Welcome.fxml`: instrucciones reales (sin "TODO") ✅ 2026-11-06.
 - [ ] `GameOver.fxml`: mensaje de victoria + "Nuevo juego".
 
 ### Fase 3 — Controlador y eventos
@@ -139,9 +140,10 @@
 - [x] Mouse: clic selecciona/resalta celda ✅ (`selectCell` + `requestFocus()`), probado en vivo.
 - [x] Teclado: 1–6 escribe, BACKSPACE/DELETE vacía, resto `consume()` ✅ (`SudokuBoardAdapter`), probado en vivo.
 - [x] Validación en tiempo real → borde rojo + mensaje ✅ probada en vivo.
-- [ ] Ayuda: 1 celda por clic, contador 3 → 0, botón se deshabilita (hoy `onHelp` ignora `GameState`).
+- [x] Ayuda: 1 celda por clic vía `GameState.giveHint()`, contador "Ayuda (n)" y botón deshabilitado en 0 (2026-11-06, sin probar en pantalla aún).
+- [ ] ⚠️ Ayuda no debe poder **terminar el tablero**: `giveHint` aún puede rellenar la última casilla. Pendiente en `GameState` (decidir con el equipo).
 - [ ] Detección de victoria → `showGameOver` (hoy muestra un `Alert` suelto).
-- [ ] Alerta de confirmación al iniciar nuevo juego (solo desde el Welcome, falta el botón "Nuevo juego" en partida).
+- [x] Alerta de confirmación en el botón "Nuevo juego" dentro de la partida (2026-11-06) y en el Welcome.
 - [ ] Usar `EnterKeyAdapter` en alguna escena (Welcome o GameOver).
 
 ### Fase 4 — Pantalla de victoria

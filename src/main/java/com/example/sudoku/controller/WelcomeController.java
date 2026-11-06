@@ -20,7 +20,7 @@ public class WelcomeController implements Navigable {
     }
 
     @FXML
-    private Button newGameButton;
+    private Button gameButton;
 
     /**
      * Handles the start button and navigates to the game scene.

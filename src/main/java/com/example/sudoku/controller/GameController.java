@@ -4,26 +4,21 @@ import com.example.sudoku.model.AlertHelper;
 import com.example.sudoku.model.GameState;
 import com.example.sudoku.model.SudokuBoard;
 import com.example.sudoku.model.SudokuBoardAdapter;
-import com.example.sudoku.model.SudokuGenerator;
 import com.example.sudoku.service.navigation.Navigable;
 import com.example.sudoku.service.navigation.Navigator;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.event.ActionEvent;
-import javafx.scene.input.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
- * Controller for the game scene. Connects the {@link GameState} model with
- * the view.
+ * Controller for the game scene. Turns player actions into calls to
+ * {@link GameState} and repaints the cells from the answers the model gives.
+ * It holds no Sudoku rules of its own.
  */
 public class GameController implements Navigable {
     private Navigator navigator;
@@ -42,9 +37,8 @@ public class GameController implements Navigable {
     @FXML
     private Label statusLabel;
 
-    private final SudokuBoard board;
-    private final SudokuGenerator generator;
-    private TextField[][] cellFields;
+    private final GameState game;
+    private final TextField[][] cellFields;
 
     /** Row of the cell the player last clicked, {@code -1} when none. */
     private int selectedRow = -1;
@@ -52,23 +46,26 @@ public class GameController implements Navigable {
     /** Column of the cell the player last clicked, {@code -1} when none. */
     private int selectedCol = -1;
 
-    /**
-     * Cells currently painted red because they repeat a number. Kept so the
-     * next repaint can clear them without scanning the whole board.
-     */
+    /** Row of the cell filled by the last hint, {@code -1} when none. */
+    private int hintRow = -1;
+
+    /** Column of the cell filled by the last hint, {@code -1} when none. */
+    private int hintCol = -1;
+
+    /** Cells that currently repeat a number, recomputed after every edit. */
     private final List<int[]> conflictCells = new ArrayList<>();
 
     /**
-     * {@code true} while the controller writes into the cells on purpose.
-     * Guards the text listener from treating a programmatic fill as a keystroke.
+     * {@code true} while the controller writes text into the cells itself.
+     * Stops the text listener from treating that write as a keystroke.
      */
     private boolean syncingUI = false;
 
     public GameController() {
-        this.board = new SudokuBoard();
-        this.generator = new SudokuGenerator();
+        this.game = new GameState();
         this.cellFields = new TextField[SudokuBoard.SIZE][SudokuBoard.SIZE];
     }
+
     @FXML
     public void initialize() {
         buildgridUI();
@@ -82,8 +79,8 @@ public class GameController implements Navigable {
             for (int c = 0; c < SudokuBoard.SIZE; c++) {
                 TextField cell = new TextField();
                 cell.setPrefSize(50, 50);
-                cell.setAlignment(Pos.CENTER);
-                cell.setFont(Font.font("System", FontWeight.BOLD, 18));
+                // Look and feel come from style.css: .celda + the block border class
+                cell.getStyleClass().setAll("celda", blockBorderClass(r, c));
 
                 final int row = r;
                 final int col = c;
@@ -100,10 +97,58 @@ public class GameController implements Navigable {
         }
     }
 
+    /**
+     * Picks the border class that draws the 2x3 block limits for a position.
+     * Even rows open a block (thick top), odd rows close one (thick bottom);
+     * columns 0 and 3 open a block (thick left), columns 2 and 5 close one
+     * (thick right).
+     *
+     * @param row zero-based row index
+     * @param col zero-based column index
+     * @return one of {@code borde-sup}, {@code borde-sup-izq}, {@code borde-sup-der},
+     *         {@code borde-inf}, {@code borde-inf-izq} or {@code borde-inf-der}
+     */
+    private String blockBorderClass(int row, int col) {
+        String horizontal = (row % 2 == 0) ? "sup" : "inf";
+
+        if (col % 3 == 0) {
+            return "borde-" + horizontal + "-izq";
+        }
+        if (col % 3 == 2) {
+            return "borde-" + horizontal + "-der";
+        }
+        return "borde-" + horizontal;
+    }
+
+    /** Starts a fresh puzzle and resets the view to match it. */
     private void startNewGame() {
-        generator.generateNewGame(board);
-        updateUIFromBoard();
+        game.newGame();
+        selectedRow = -1;
+        selectedCol = -1;
+        hintRow = -1;
+        hintCol = -1;
+        writeCellTexts();
+        refreshConflicts();
+        repaintAll();
+        updateHelpButton();
         statusLabel.setText("¡Nuevo juego iniciado! Completa el tablero.");
+    }
+
+    /**
+     * Asks for confirmation before discarding the current game.
+     *
+     * @param event the button press that triggered the action
+     */
+    @FXML
+    void onNewGame(ActionEvent event) {
+        boolean confirmed = AlertHelper.showConfirmation(
+                "Nuevo juego",
+                "¿Descartar la partida actual y empezar una nueva?"
+        );
+
+        if (confirmed) {
+            startNewGame();
+        }
     }
 
     /**
@@ -114,124 +159,124 @@ public class GameController implements Navigable {
      * @param col zero-based column index
      */
     private void selectCell(int row, int col) {
-        if (board.isClue(row, col)) {
+        if (game.isClue(row, col)) {
             statusLabel.setText("Esa casilla es una pista fija: no se puede editar.");
             return;
         }
 
-        int previousRow = selectedRow;
-        int previousCol = selectedCol;
-
         selectedRow = row;
         selectedCol = col;
-
-        if (previousRow >= 0) {
-            resetCellBorder(cellFields[previousRow][previousCol], previousRow, previousCol);
-        }
-        repaintSelection();
+        repaintAll();
         cellFields[row][col].requestFocus();
     }
 
-    /** Paints the active cell with the selection colour. */
-    private void repaintSelection() {
-        if (selectedRow < 0) {
-            return;
-        }
-        cellFields[selectedRow][selectedCol].setStyle(
-                "-fx-border-color: #3b82f6; -fx-border-width: 3px;"
-                        + " -fx-background-color: #dbeafe; -fx-text-fill: #1e293b;"
-                        + " -fx-alignment: center;"
-        );
-    }
-
+    /**
+     * Reacts to a change typed in a cell: stores it in the model, recomputes
+     * the conflicts and repaints.
+     *
+     * @param row zero-based row index
+     * @param col zero-based column index
+     */
     private void handleCellUpdate(int row, int col) {
         if (syncingUI) {
             return;
         }
-        TextField cell = cellFields[row][col];
-        String text = cell.getText().trim();
+
+        hintRow = -1;
+        hintCol = -1;
+
+        String text = cellFields[row][col].getText().trim();
 
         if (text.isEmpty()) {
-            board.setValue(row, col, 0);
-            conflictCells.clear();
-            repaintAll();
-            statusLabel.setText("Casilla vacía.");
+            game.clearCell(row, col);
+        } else if (!game.play(row, col, Integer.parseInt(text))) {
+            return;
+        }
+
+        refreshConflicts();
+        repaintAll();
+
+        if (game.isWon()) {
+            statusLabel.setText("¡Felicidades! Has resuelto el Sudoku con éxito.");
+            AlertHelper.showInfo("¡Juego Completado!", "¡Excelente trabajo! Has completado el tablero.");
+        } else if (!conflictCells.isEmpty()) {
+            statusLabel.setText("Conflicto: hay números repetidos en fila, columna o bloque.");
         } else {
-            int value = Integer.parseInt(text);
-            board.setValue(row, col, value);
-
-            conflictCells.clear();
-            conflictCells.addAll(board.getConflicts(row, col, value));
-            repaintAll();
-
-            if (!conflictCells.isEmpty()) {
-                statusLabel.setText("Conflicto: El número " + value
-                        + " se repite en fila, columna o bloque.");
-            } else {
-                statusLabel.setText("Entrada válida.");
-
-                // Verificar si se completó el juego
-                if (board.isComplete() && board.isValid()) {
-                    statusLabel.setText("¡Felicidades! Has resuelto el Sudoku con éxito.");
-                    AlertHelper.showInfo("¡Juego Completado!",
-                            "¡Excelente trabajo! Has completado el tablero.");
-                }
-            }
+            statusLabel.setText(text.isEmpty() ? "Casilla vacía." : "Entrada válida.");
         }
-    }
-
-    @FXML
-    void onHelp(ActionEvent event) {
-        for (int r = 0; r < SudokuBoard.SIZE; r++) {
-            for (int c = 0; c < SudokuBoard.SIZE; c++) {
-                if (board.getValue(r, c) == 0) {
-                    for (int num = 1; num <= SudokuBoard.SIZE; num++) {
-                        if (board.isValidPlacement(r, c, num)) {
-                            cellFields[r][c].setStyle("-fx-border-color: #3b82f6; -fx-border-width: 2px; -fx-background-color: #dbeafe;");
-                            statusLabel.setText("Sugerencia: Intenta colocar el número " + num + " en la celda resaltada.");
-                            return;
-                        }
-                    }
-                }
-            }
-        }
-        statusLabel.setText("No hay casillas vacías disponibles para dar sugerencias.");
     }
 
     /**
-     * Sincroniza la vista con el estado del modelo tras generar un nuevo juego.
-     * The flag stops the text listener from reading back what we just wrote.
+     * Fills one cell through the model and highlights it. The model decides
+     * which cell and value; this method only shows the result.
+     *
+     * @param event the button press that triggered the action
      */
-    private void updateUIFromBoard() {
+    @FXML
+    void onHelp(ActionEvent event) {
+        int[] cell = game.giveHint();
+
+        if (cell == null) {
+            statusLabel.setText("No hay ayudas disponibles en este momento.");
+            updateHelpButton();
+            return;
+        }
+
+        hintRow = cell[0];
+        hintCol = cell[1];
+        writeCellTexts();
+        refreshConflicts();
+        repaintAll();
+        updateHelpButton();
+        statusLabel.setText("Ayuda: la casilla resaltada ahora tiene el número "
+                + game.getValue(hintRow, hintCol) + ".");
+    }
+
+    /** Shows how many hints are left and disables the button when none are. */
+    private void updateHelpButton() {
+        helpButton.setText("Ayuda (" + game.getHintsLeft() + ")");
+        helpButton.setDisable(game.getHintsLeft() == 0);
+    }
+
+    /**
+     * Copies the model's values into the text fields. Clues become read-only.
+     * The flag stops the text listener from reading back what was just written.
+     */
+    private void writeCellTexts() {
         syncingUI = true;
         try {
             for (int r = 0; r < SudokuBoard.SIZE; r++) {
                 for (int c = 0; c < SudokuBoard.SIZE; c++) {
-                    TextField cell = cellFields[r][c];
-                    int val = board.getValue(r, c);
-
-                    if (board.isClue(r, c)) {
-                        cell.setText(String.valueOf(val));
-                        cell.setEditable(false);
-                    } else {
-                        cell.setText(val == 0 ? "" : String.valueOf(val));
-                        cell.setEditable(true);
-                    }
+                    int value = game.getValue(r, c);
+                    cellFields[r][c].setText(value == 0 ? "" : String.valueOf(value));
+                    cellFields[r][c].setEditable(!game.isClue(r, c));
                 }
             }
         } finally {
             syncingUI = false;
         }
-
-        selectedRow = -1;
-        selectedCol = -1;
-        conflictCells.clear();
-        repaintAll();
     }
 
     /**
-     * Repaints every cell from a single source of truth: clue colour wins first,
-     * then conflict red, then the blue selection border.
+     * Recomputes every cell that repeats a number with another one, so a
+     * conflict disappears as soon as the repeated number is corrected.
+     */
+    private void refreshConflicts() {
+        conflictCells.clear();
+
+        for (int r = 0; r < SudokuBoard.SIZE; r++) {
+            for (int c = 0; c < SudokuBoard.SIZE; c++) {
+                int value = game.getValue(r, c);
+                if (value != 0 && !game.getConflicts(r, c, value).isEmpty()) {
+                    conflictCells.add(new int[]{r, c});
+                }
+            }
+        }
+    }
+
+    /**
+     * Repaints every cell from a single source of truth: the block border comes
+     * from its position and the state class from what the cell currently is.
      */
     private void repaintAll() {
         for (int r = 0; r < SudokuBoard.SIZE; r++) {
@@ -241,30 +286,46 @@ public class GameController implements Navigable {
         }
     }
 
-    /** Gives one cell the style dictated by its state. */
+    /**
+     * Rebuilds the style class list of one cell. The list always holds the base
+     * class plus the block border, and at most one state class on top of them.
+     *
+     * @param cell the cell to restyle
+     * @param row  zero-based row index
+     * @param col  zero-based column index
+     */
     private void resetCellBorder(TextField cell, int row, int col) {
-        if (board.isClue(row, col)) {
-            cell.setStyle("-fx-background-color: #e2e8f0; -fx-font-weight: bold;"
-                    + " -fx-text-fill: black; -fx-alignment: center;");
-            return;
-        }
+        String state = stateClass(row, col);
 
+        if (state == null) {
+            cell.getStyleClass().setAll("celda", blockBorderClass(row, col));
+        } else {
+            cell.getStyleClass().setAll("celda", blockBorderClass(row, col), state);
+        }
+    }
+
+    /**
+     * Resolves the state class of a cell, if any. Priority: an immutable clue
+     * never looks like an error, and an error outranks the help and selection.
+     *
+     * @param row zero-based row index
+     * @param col zero-based column index
+     * @return the state class, or {@code null} when the cell is at rest
+     */
+    private String stateClass(int row, int col) {
+        if (game.isClue(row, col)) {
+            return "celda-pista";
+        }
         if (isConflict(row, col)) {
-            cell.setStyle("-fx-border-color: #dc2626; -fx-border-width: 2px;"
-                    + " -fx-background-color: #fee2e2; -fx-text-fill: #991b1b;"
-                    + " -fx-alignment: center;");
-            return;
+            return "celda-error";
         }
-
+        if (row == hintRow && col == hintCol) {
+            return "celda-ayuda";
+        }
         if (row == selectedRow && col == selectedCol) {
-            cell.setStyle("-fx-border-color: #3b82f6; -fx-border-width: 3px;"
-                    + " -fx-background-color: #dbeafe; -fx-text-fill: #1e293b;"
-                    + " -fx-alignment: center;");
-            return;
+            return "celda-seleccionada";
         }
-
-        cell.setStyle("-fx-border-color: #cbd5e1; -fx-background-color: white;"
-                + " -fx-text-fill: #1e293b; -fx-alignment: center;");
+        return null;
     }
 
     /**
@@ -281,10 +342,3 @@ public class GameController implements Navigable {
         return false;
     }
 }
-
-
-
-
-
-
-

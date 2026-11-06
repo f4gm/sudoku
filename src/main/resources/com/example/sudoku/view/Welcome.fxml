@@ -4,22 +4,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="400.0" spacing="20" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sudoku.controller.WelcomeController">
-    <Label text="¡Bienvenido a Sudoku!">
-      <font>
-         <Font size="36.0" />
-      </font></Label>
-    <Label text="Intrucciones TODO">
-      <font>
-         <Font size="18.0" />
-      </font></Label>
-    <Button fx:id="gameButton" onAction="#onStart" text="Comenzar">
-      <font>
-         <Font size="16.0" />
-      </font></Button>
+<VBox alignment="CENTER" prefHeight="400.0" prefWidth="400.0" spacing="20.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sudoku.controller.WelcomeController">
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
+   <children>
+      <Label styleClass="titulo" text="¡Bienvenido a Sudoku!" />
+      <Label prefWidth="360.0" styleClass="subtitulo" text="Completa el tablero 6×6 con los números del 1 al 6. Cada número debe aparecer una sola vez en cada fila, en cada columna y en cada bloque de 2×3. Haz clic en una celda y escribe el número. Usa BORRAR o SUPR para vaciarla. Tienes 3 ayudas." textAlignment="CENTER" wrapText="true" />
+      <Button fx:id="gameButton" mnemonicParsing="false" onAction="#onStart" styleClass="boton" text="Comenzar" />
+   </children>
 </VBox>
