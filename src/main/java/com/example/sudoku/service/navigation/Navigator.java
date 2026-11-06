@@ -33,17 +33,15 @@ public class Navigator {
     }
 
     /**
-     * Displays the game-over screen and presents a summary of the game.
+     * Displays the game-over screen with the message to show the player.
      *
-     * @param completedLevels levels completed by the player
-     * @param reason the reason the game ended
-     * @param remainingSeconds seconds remaining when the game ended
+     * @param message text shown on the game-over screen
      */
-    public void showGameOver(int completedLevels, String reason, double remainingSeconds) {
+    public void showGameOver(String message) {
         Object controller = show("/com/example/sudoku/view/GameOver.fxml");
 
         if (controller instanceof SummaryAware summaryAware) {
-            summaryAware.setSummary(completedLevels, reason, remainingSeconds);
+            summaryAware.setSummary(message);
         }
     }
 

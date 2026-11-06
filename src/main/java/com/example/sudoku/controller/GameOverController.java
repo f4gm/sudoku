@@ -19,16 +19,10 @@ public class GameOverController implements Navigable, SummaryAware {
     }
 
     @FXML
-    private Label feedbackLabel;
-
-    @FXML
-    private Label recordLabel;
-
-    @FXML
-    private Label remainingTimeLabel;
+    private Label messageLabel;
 
     /**
-     * Restarts from level 1
+     * Starts a new game and returns to the game scene.
      */
     @FXML
     private void restartGame() {
@@ -36,13 +30,13 @@ public class GameOverController implements Navigable, SummaryAware {
     }
 
     /**
-     * Draws the game summary.
-     * Executed after initialize(), so the labels have already been injected.
+     * Shows the message. The Navigator calls this after the FXML is loaded,
+     * so {@code messageLabel} has already been injected.
+     *
+     * @param message text shown on the game-over screen
      */
     @Override
-    public void setSummary(int completedLevels, String reason, double remainingSeconds) {
-        feedbackLabel.setText(reason);
-        recordLabel.setText("Niveles completados: " + completedLevels);
-        remainingTimeLabel.setText("Tiempo restante: " + remainingSeconds + "s");
+    public void setSummary(String message) {
+        messageLabel.setText(message);
     }
 }

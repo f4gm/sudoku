@@ -8,11 +8,9 @@ package com.example.sudoku.service.navigation;
 public interface SummaryAware {
 
     /**
-     * Receives the match summary when the game-over scene is displayed.
+     * Receives the message to show when the game-over scene is displayed.
      *
-     * @param completedLevels levels completed by the player
-     * @param reason the reason the match ended (e.g., "Time ran out")
-     * @param remainingSeconds seconds remaining when the match ended
+     * @param message text shown to the player, e.g. the victory message
      */
-    void setSummary(int completedLevels, String reason, double remainingSeconds);
+    void setSummary(String message);
 }

@@ -147,8 +147,10 @@
 - [ ] Usar `EnterKeyAdapter` en alguna escena (Welcome o GameOver).
 
 ### Fase 4 — Pantalla de victoria
-- [ ] Simplificar `SummaryAware` / `Navigator.showGameOver` (sin niveles ni tiempo).
-- [ ] Corregir `GameOver.fxml` (`onAction`, `fx:id`) y `restartGame()`.
+- [x] Simplificar `SummaryAware` / `Navigator.showGameOver` a un solo mensaje (2026-11-06).
+- [x] Corregir `GameOver.fxml` (`onAction="#restartGame"`, `fx:id="messageLabel"`) y `GameOverController` (2026-11-06).
+- [x] Victoria conectada: `GameController` llama `navigator.showGameOver(...)` en lugar del `Alert` (2026-11-06). Compila y Javadoc OK.
+- [ ] Probar en pantalla la victoria: resolver un tablero y comprobar que aparece GameOver y que "Nuevo juego" vuelve a un tablero nuevo.
 
 ### Fase 5 — Verificación
 - [ ] Checklist HU-1 … HU-5 completo.

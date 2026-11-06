@@ -197,8 +197,7 @@ public class GameController implements Navigable {
         repaintAll();
 
         if (game.isWon()) {
-            statusLabel.setText("¡Felicidades! Has resuelto el Sudoku con éxito.");
-            AlertHelper.showInfo("¡Juego Completado!", "¡Excelente trabajo! Has completado el tablero.");
+            navigator.showGameOver("¡Felicidades, lograste superar el Sudoku!");
         } else if (!conflictCells.isEmpty()) {
             statusLabel.setText("Conflicto: hay números repetidos en fila, columna o bloque.");
         } else {

@@ -12,7 +12,7 @@
       <Insets top="20.0" />
    </padding>
    <children>
-      <Label alignment="TOP_CENTER" contentDisplay="TOP" prefHeight="79.0" prefWidth="422.0" text="¡Felicidades, lograste superar el sudoku!">
+      <Label fx:id="messageLabel" alignment="TOP_CENTER" contentDisplay="TOP" prefHeight="79.0" prefWidth="422.0" text="¡Felicidades, lograste superar el sudoku!">
          <padding>
             <Insets top="20.0" />
          </padding>
@@ -23,6 +23,6 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="newGameButton" mnemonicParsing="false" onAction="#onStart" text="Nuevo Juego" />
+      <Button fx:id="newGameButton" mnemonicParsing="false" onAction="#restartGame" styleClass="boton" text="Nuevo juego" />
    </children>
 </VBox>
