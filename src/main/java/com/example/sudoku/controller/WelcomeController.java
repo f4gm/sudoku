@@ -33,8 +33,7 @@ public class WelcomeController implements Navigable {
         );
 
         if (confirmed) {
-            startNewGame();
+            navigator.showGame();
         }
-        navigator.showGame();
     }
 }
