@@ -10,8 +10,8 @@
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
    <children>
-      <Label styleClass="titulo" text="¡Bienvenido a Sudoku!" />
-      <Label prefWidth="360.0" styleClass="subtitulo" text="Completa el tablero 6×6 con los números del 1 al 6. Cada número debe aparecer una sola vez en cada fila, en cada columna y en cada bloque de 2×3. Haz clic en una celda y escribe el número. Usa BORRAR o SUPR para vaciarla. Tienes 3 ayudas." textAlignment="CENTER" wrapText="true" />
-      <Button fx:id="gameButton" mnemonicParsing="false" onAction="#onStart" styleClass="boton" text="Comenzar" />
+      <Label styleClass="title" text="¡Bienvenido a Sudoku!" />
+      <Label prefWidth="360.0" styleClass="subtitle" text="Completa el tablero 6×6 con los números del 1 al 6. Cada número debe aparecer una sola vez en cada fila, en cada columna y en cada bloque de 2×3. Haz clic en una celda y escribe el número. Usa BORRAR o SUPR para vaciarla. Tienes 3 ayudas." textAlignment="CENTER" wrapText="true" />
+      <Button fx:id="gameButton" mnemonicParsing="false" onAction="#onStart" styleClass="button" text="Comenzar" />
    </children>
 </VBox>

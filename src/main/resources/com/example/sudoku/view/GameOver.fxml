@@ -23,6 +23,6 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <Button fx:id="newGameButton" mnemonicParsing="false" onAction="#restartGame" styleClass="boton" text="Nuevo juego" />
+      <Button fx:id="newGameButton" mnemonicParsing="false" onAction="#restartGame" styleClass="button" text="Nuevo juego" />
    </children>
 </VBox>

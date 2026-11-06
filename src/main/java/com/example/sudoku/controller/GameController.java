@@ -66,19 +66,46 @@ public class GameController implements Navigable {
 
     @FXML
     public void initialize() {
-        buildgridUI();
+        buildGridUI();
         startNewGame();
     }
 
-    private void buildgridUI() {
+    /**
+     * Builds the 6x6 grid of editable cells and stores them in {@link #cellFields}.
+     *
+     * <p>The 36 cells are created here in a loop instead of being written by hand in
+     * the FXML: they are identical, so generating them keeps the row/column indexes
+     * in sync with the model and avoids 36 duplicated blocks of markup. Each cell is
+     * added at {@code (column, row)} because that is the {@code GridPane} convention,
+     * and kept in {@link #cellFields} so the rest of the controller can repaint a cell
+     * without searching the scene graph.</p>
+     *
+     * <p>Every cell is wired with the two input channels of the game:</p>
+     * <ul>
+     *   <li><b>Mouse</b>: a click calls {@link #selectCell(int, int)}, which is what
+     *       moves the selection and gives the cell focus for typing.</li>
+     *   <li><b>Keyboard</b>: {@link SudokuBoardAdapter} filters the keys to 1-6,
+     *       handles BACKSPACE/DELETE and reports each change through
+     *       {@link #handleCellUpdate(int, int)}.</li>
+     * </ul>
+     *
+     * <p>Look and feel comes only from {@code style.css}: this method assigns the
+     * base {@code cell} class plus the border class of the position, and no colours
+     * or fonts. Calling it again rebuilds the grid from scratch, since the current
+     * children are cleared first.</p>
+     *
+     * <p>Runs on the JavaFX Application Thread, and must run before
+     * {@link #startNewGame()} because that method writes into {@link #cellFields}.</p>
+     */
+    private void buildGridUI() {
         sudokuGrid.getChildren().clear();
 
         for (int r = 0; r < SudokuBoard.SIZE; r++) {
             for (int c = 0; c < SudokuBoard.SIZE; c++) {
                 TextField cell = new TextField();
                 cell.setPrefSize(50, 50);
-                // Look and feel come from style.css: .celda + the block border class
-                cell.getStyleClass().setAll("celda", blockBorderClass(r, c));
+                // Look and feel come from style.css: .cell + the block border class
+                cell.getStyleClass().setAll("cell", blockBorderClass(r, c));
 
                 final int row = r;
                 final int col = c;
@@ -103,19 +130,19 @@ public class GameController implements Navigable {
      *
      * @param row zero-based row index
      * @param col zero-based column index
-     * @return one of {@code borde-sup}, {@code borde-sup-izq}, {@code borde-sup-der},
-     *         {@code borde-inf}, {@code borde-inf-izq} or {@code borde-inf-der}
+     * @return one of {@code border-top}, {@code border-left-top}, {@code border-right-top},
+     *         {@code border-bottom}, {@code border-left-bottom} or {@code border-right-bottom}
      */
     private String blockBorderClass(int row, int col) {
-        String horizontal = (row % 2 == 0) ? "sup" : "inf";
+        String horizontal = (row % SudokuBoard.SUBGRID_ROWS == 0) ? "top" : "bottom";
 
-        if (col % 3 == 0) {
-            return "borde-" + horizontal + "-izq";
+        if (col % SudokuBoard.SUBGRID_COLS == 0) {
+            return "border-left-" + horizontal;
         }
-        if (col % 3 == 2) {
-            return "borde-" + horizontal + "-der";
+        if (col % SudokuBoard.SUBGRID_COLS == 2) {
+            return "border-right-" + horizontal;
         }
-        return "borde-" + horizontal;
+        return "border-" + horizontal;
     }
 
     /** Starts a fresh puzzle and resets the view to match it. */
@@ -295,9 +322,9 @@ public class GameController implements Navigable {
         String state = stateClass(row, col);
 
         if (state == null) {
-            cell.getStyleClass().setAll("celda", blockBorderClass(row, col));
+            cell.getStyleClass().setAll("cell", blockBorderClass(row, col));
         } else {
-            cell.getStyleClass().setAll("celda", blockBorderClass(row, col), state);
+            cell.getStyleClass().setAll("cell", blockBorderClass(row, col), state);
         }
     }
 
@@ -311,16 +338,16 @@ public class GameController implements Navigable {
      */
     private String stateClass(int row, int col) {
         if (game.isClue(row, col)) {
-            return "celda-pista";
+            return "clue-cell";
         }
         if (isConflict(row, col)) {
-            return "celda-error";
+            return "error-cell";
         }
         if (row == hintRow && col == hintCol) {
-            return "celda-ayuda";
+            return "help-cell";
         }
         if (row == selectedRow && col == selectedCol) {
-            return "celda-seleccionada";
+            return "selected-cell";
         }
         return null;
     }

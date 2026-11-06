@@ -1,6 +1,7 @@
 package com.example.sudoku.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -45,6 +46,15 @@ public class SudokuBoard {
      */
     public int getValue(int row, int column){
         return values[row][column];
+    }
+
+    /**
+     * Print the board to the console
+     */
+    public void printBoard() {
+        System.out.println(
+                Arrays.deepToString(values)
+        );
     }
 
     /**
