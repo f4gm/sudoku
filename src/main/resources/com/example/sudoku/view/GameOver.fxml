@@ -7,22 +7,12 @@
 <?import javafx.scene.text.Font?>
 
 
-<VBox alignment="CENTER" prefHeight="325.0" prefWidth="450.0" spacing="20" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sudoku.controller.GameOverController">
+<VBox alignment="CENTER" prefHeight="500" prefWidth="650" spacing="20" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.sudoku.controller.GameOverController">
    <padding>
       <Insets top="20.0" />
    </padding>
    <children>
-      <Label fx:id="messageLabel" alignment="TOP_CENTER" contentDisplay="TOP" prefHeight="79.0" prefWidth="422.0" text="¡Felicidades, lograste superar el sudoku!">
-         <padding>
-            <Insets top="20.0" />
-         </padding>
-         <VBox.margin>
-            <Insets />
-         </VBox.margin>
-         <font>
-            <Font size="24.0" />
-         </font>
-      </Label>
+      <Label fx:id="messageLabel" styleClass="title" text="¡Felicidades, lograste superar el sudoku!" textAlignment="CENTER" wrapText="true" />
       <Button fx:id="newGameButton" mnemonicParsing="false" onAction="#restartGame" styleClass="button" text="Nuevo juego" />
    </children>
 </VBox>
